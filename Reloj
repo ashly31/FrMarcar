@@ -31,7 +31,15 @@ namespace ControlAsistencia
 
         bool Update()
         {
+            drawingArea.GdkWindow.Clear();
+            
+            label1.Text = DateTime.Now.ToString("HH:mm:ss");
+        
             DrawRing(drawingArea.GdkWindow);
+            HourLine(drawingArea.GdkWindow);
+            MinuteLine(drawingArea.GdkWindow);
+            SecondsLine(drawingArea.GdkWindow);
+            
             return true;
 
         }
@@ -92,22 +100,134 @@ namespace ControlAsistencia
 
                 ring.Antialias = universalAntiA;
                 ring.Translate(100, 100);
-                ring.Rotate(0);
-                ring.LineWidth = 4;
+                ring.Rotate(rotateAmount);
+                ring.LineWidth = 3;
                 ring.MoveTo(point1);
                 ring.LineTo(point2);
+                ring.LineCap = LineCap.Round;
 
                 ring.SetSourceColor(new Cairo.Color(0.95, 0.95, 0.95));
                 ring.Stroke();
 
                 ring.GetTarget().Dispose();
                 ring.Dispose();
-
+                
+                clockAmount++;
+                rotateAmount += (Math.PI * 2) / 12;
             }
-           
-
         }
 
+         public void HourLine(Gdk.Window drawingArea)
+         {
+         
+            Cairo.Context ring = Gdk.CairoHelper.Create(drawingArea);
+
+                PointD point1, point2;
+
+                point1 = new PointD(0, 0);
+                point2 = new PointD(0, -60);
+
+                ring.Antialias = universalAntiA;
+                ring.Translate(100, 100);
+                ring.Rotate(CalculateHourRadians());
+                ring.LineWidth = 8;
+                ring.MoveTo(point1);
+                ring.LineTo(point2);
+                ring.LineCap = LineCap.Round;
+
+                ring.SetSourceColor(new Cairo.Color(0.5, 0.1, 0.1));
+                ring.Stroke();
+
+                ring.GetTarget().Dispose();
+                ring.Dispose();
+         
+         }
+     
+         public void MinuteLine(Gdk.Window drawingArea)
+         {
+             Cairo.Context ring = Gdk.CairoHelper.Create(drawingArea);
+
+                PointD point1, point2;
+
+                point1 = new PointD(0, 0);
+                point2 = new PointD(0, -90);
+
+                ring.Antialias = universalAntiA;
+                ring.Translate(100, 100);
+                ring.Rotate(CalculateMinuteRadians());
+                ring.LineWidth = 4;
+                ring.MoveTo(point1);
+                ring.LineTo(point2);
+                ring.LineCap = LineCap.Round;
+
+                ring.SetSourceColor(new Cairo.Color(0.95, 0.95, 0.95));
+                ring.Stroke();
+
+                ring.GetTarget().Dispose();
+                ring.Dispose();
+         
+         }
+         
+         public void SecondsLine(Gdk.Window drawingArea)
+         {
+             Cairo.Context ring = Gdk.CairoHelper.Create(drawingArea);
+
+                PointD point1, point2;
+
+                point1 = new PointD(0, 0);
+                point2 = new PointD(0, -90);
+
+                ring.Antialias = universalAntiA;
+                ring.Translate(100, 100);
+                ring.Rotate(CalculateSecondRadians());
+                ring.LineWidth = 2;
+                ring.MoveTo(point1);
+                ring.LineTo(point2);
+                ring.LineCap = LineCap.Round;
+
+                ring.SetSourceColor(new Cairo.Color(0.95, 0.95, 0.95));
+                ring.Stroke();
+
+                ring.GetTarget().Dispose();
+                ring.Dispose();
+         }
+         
+         double CalculateSecondRadians()
+         {
+             double radian = Math.PI * 2;
+             
+             radian = radian * (0.01666666667 * DateTime.Now.Second);
+             
+             return radian;
+         }
+         
+         double CalculateMinuteRadians()
+         {
+             double radian = Math.PI * 2;
+             
+             radian = radian * (0.01666666667 * DateTime.Now.Minute);
+             
+             return radian;
+         }
+         
+         double CalculateHourRadians()
+         { 
+             double radian = Math.PI * 2;
+             int minutes;
+             
+             if(DateTime.Now.Hour > 12)
+             {
+                 minutes = (DateTime.Now.Hour - 12) * 60 + (DateTime.Now.Minute);
+             }
+             else 
+             {
+                 minutes = DateTime.Now.Hour * 60 + (DateTime.Now.Minute);
+             }
+             
+             radian = radian * (0.001388889 * (double)minutes);
+             
+             return radian;
+         }
      }
 
 
